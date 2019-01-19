@@ -6,7 +6,7 @@ This directory contains programs which are cross-compiled binary of various soft
 to encode audio files 
 
 
-## List of software
+## List of softwares
 
 - SoX
 - FFmpeg v4.1
@@ -19,7 +19,7 @@ First, Install Docker.
 Just execute below command to build dependencies:  
 
 ```bash
-$ docker run --rm -v $PROJECT_ROOT/deps:/remote-workspace -it YOUR_DEVELOPMENT_DOCKER_IMAGAE /remote-workspace/build.sh
+$ docker run --rm -v $PROJECT_ROOT/deps:/remote-workspace -it lambci/lambda:build-nodejs8.10 /remote-workspace/build.sh
 ```
 
 That's it! You'll see built binaries in this directory.
