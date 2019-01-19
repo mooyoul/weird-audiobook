@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es2017",
+        "noImplicitAny": true,
+        "sourceMap": true,
+        "outDir": "dst",
+        "strict": false,
+        "strictNullChecks": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "lib": [
+            "dom",
+            "esnext",
+            "esnext.asynciterable"
+        ]
+    },
+    "exclude": [
+        "**/__test__/"
+    ],
+    "include": [
+        "src/**/*"
+    ]
+}

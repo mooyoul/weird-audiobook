@@ -1,0 +1,11 @@
+STAGE: stage
+AUDIOBOOK_BUCKET:
+  Ref: S3Bucket
+# EDIT ME
+CLOVA_CSS_CLIENT_ID: YOUR_CLOVA_CSS_CLIENT_ID
+# EDIT ME
+CLOVA_CSS_CLIENT_SECRET: YOUR_CLOVA_CSS_CLIENT_SECRET
+SOX_BINARY_PATH: /var/task/deps/sox-amazonlinux-amd64
+FFMPEG_BINARY_PATH: /var/task/deps/ffmpeg-4.1-amazonlinux-amd64
+FFPROBE_BINARY_PATH: /var/task/deps/ffprobe-4.1-amazonlinux-amd64
+DEBUG: "weird-audiobook:*"

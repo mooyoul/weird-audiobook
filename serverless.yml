@@ -1,0 +1,373 @@
+service: weird-audiobook
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  stage: prod
+  environment: ${file(./env/${opt:stage}.yml)}
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "polly:*"
+        - "dynamodb:*"
+        - "lambda:InvokeFunction"
+      Resource: "*"
+    - Effect: "Allow"
+      Action:
+        - "s3:*"
+      Resource:
+        Fn::Join:
+          - ""
+          - - Fn::GetAtt: [S3Bucket, Arn]
+            -  "/*"
+    - Effect: "Allow"
+      Action:
+        - "sqs:ReceiveMessage"
+        - "sqs:SendMessage"
+        - "sqs:DeleteMessage"
+        - "sqs:GetQueueAttributes"
+      Resource:
+        # To prevent circular dependency issue, Use join instead
+        Fn::Join:
+          - ":"
+          - - "arn:aws:sqs"
+            - Ref: "AWS::Region"
+            - Ref: "AWS::AccountId"
+            - Ref: "TaskQueueName"
+
+plugins:
+  - serverless-prune-plugin
+  - "@vingle/serverless-tag-plugin"
+
+custom:
+  prune:
+    automatic: true
+    number: 5
+
+package:
+  artifact: dst.zip
+
+functions:
+  api:
+    handler: api.handler
+    memorySize: 512
+    timeout: 15
+    environment:
+      AUDIOBOOK_TASK_QUEUE_URL:
+        Ref: TaskQueue
+    events:
+      - http:
+          path: /{proxy+}
+          method: any
+  audiobookProcessor:
+    handler: handlers/audiobook-processor.handler
+    memorySize: 256
+    timeout: 60
+    environment:
+      AUDIO_JOINER_FUNCTION_NAME:
+        Ref: AudioJoinerLambdaFunction
+      AUDIO_TRANSCODER_FUNCTION_NAME:
+        Ref: AudioTranscoderLambdaFunction
+  audioJoiner:
+    handler: handlers/audio-joiner.handler
+    memorySize: 1536
+    timeout: 60
+  audioTranscoder:
+    handler: handlers/audio-transcoder.handler
+    memorySize: 1536
+    timeout: 60
+
+resources:
+  Parameters:
+    Stage:
+      Type: String
+      Default: ${opt:stage}
+      AllowedValues:
+        - prod
+        - stage
+      Description: Stage of Cloudformation Stack
+    TaskQueueName:
+      Type: String
+      # EDIT ME
+      Default: weird-audiobook-task-queue-${opt:stage}
+      Description: Name of task queue
+    S3BucketName:
+      Type: String
+      # EDIT ME
+      Default: weird-audiobook-${opt:stage}
+      Description: Name of S3 Bucket
+
+  Mappings:
+    CDNConfiguration:
+      prod:
+        # EDIT ME
+        ZoneId: TARGET_ROUTE53_ZONE_ID # Target Route53 Zone Id
+        # EDIT ME
+        Domain: weird-audiobook.example.com # Target Route53 domain
+        # EDIT ME
+        # NOTE: ACM Certificate should be issued from us-east-1 (N. Virginia) region.
+        AcmCertificateARN: arn:aws:acm:us-east-1:123456789012:certificate/00112233-4455-6677-8899-aabbccddeeff # Pre-issued ACM Certification ARN
+      stage:
+        # EDIT ME
+        ZoneId: TARGET_ROUTE53_ZONE_ID # Target Route53 Zone Id
+        # EDIT ME
+        Domain: stage.weird-audiobook.example.com # Target Route53 domain
+        # EDIT ME
+        # NOTE: ACM Certificate should be issued from us-east-1 (N. Virginia) region.
+        AcmCertificateARN: arn:aws:acm:us-east-1:123456789012:certificate/00112233-4455-6677-8899-aabbccddeeff # Pre-issued ACM Certification ARN
+
+  Resources:
+    ApiLogGroup:
+      Properties:
+        RetentionInDays: 14
+
+    AudiobookProcessorLogGroup:
+      Properties:
+        RetentionInDays: 14
+
+    AudioJoinerLogGroup:
+      Properties:
+        RetentionInDays: 14
+
+    AudioTranscoderLogGroup:
+      Properties:
+        RetentionInDays: 14
+
+    S3Bucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName:
+          Ref: S3BucketName
+        LifecycleConfiguration:
+          Rules:
+            - Prefix: processing/
+              AbortIncompleteMultipartUpload:
+                DaysAfterInitiation: 1 # 1 day
+              ExpirationInDays: 1 # 1 day
+              Status: Enabled
+        CorsConfiguration:
+          CorsRules:
+            - AllowedHeaders:
+                - "*"
+              AllowedOrigins:
+                # https://example.com/*
+                - Fn::Join:
+                    - ""
+                    - - "https://"
+                      - Fn::FindInMap:
+                          - CDNConfiguration
+                          - Ref: Stage
+                          - Domain
+              AllowedMethods:
+                - HEAD
+                - GET # For Browser-side (Front-End) Streaming
+              MaxAge: 3000 # in seconds
+
+    S3BucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket:
+          Ref: S3Bucket
+        PolicyDocument:
+          Statement:
+            - Action:
+                - "s3:GetObject"
+              Effect: "Allow"
+              Principal:
+                AWS:
+                  Fn::Join:
+                  - " "
+                  - - "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity"
+                    - Ref: CloudfrontOriginAccessIdentity
+              Resource:
+                Fn::Join:
+                  - ""
+                  -
+                    - "arn:aws:s3:::"
+                    - Ref: S3Bucket
+                    - "/*"
+
+    CloudfrontOriginAccessIdentity:
+      Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+      Properties:
+        CloudFrontOriginAccessIdentityConfig:
+          Comment: Origin Access Identity for weird-audiobook-${opt:stage}
+
+    CloudfrontDistribution:
+      DependsOn: S3Bucket
+      Type: AWS::CloudFront::Distribution
+      Properties:
+        DistributionConfig:
+          Aliases:
+            - Fn::FindInMap:
+              - CDNConfiguration
+              - Ref: Stage
+              - Domain
+          Origins:
+            - DomainName:
+                Fn::GetAtt: [S3Bucket, DomainName]
+              Id: S3Origin
+              S3OriginConfig:
+                OriginAccessIdentity:
+                  Fn::Join:
+                    - "/"
+                    - - "origin-access-identity/cloudfront"
+                      - Ref: CloudfrontOriginAccessIdentity
+            - DomainName:
+                Fn::Join:
+                  - ""
+                  -
+                    - Ref: ApiGatewayRestApi
+                    - ".execute-api."
+                    - Ref: AWS::Region
+                    - ".amazonaws.com"
+              OriginPath: "/${opt:stage}"
+              Id: APIGatewayOrigin
+              CustomOriginConfig:
+                OriginProtocolPolicy: https-only
+                OriginSSLProtocols:
+                  - TLSv1
+                  - TLSv1.1
+                  - TLSv1.2
+          Enabled: true
+          Comment: weird-audiobook-${opt:stage}
+          IPV6Enabled: true
+          DefaultCacheBehavior:
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+            TargetOriginId: S3Origin
+            DefaultTTL: 3153600000 # 100 year
+            MinTTL: 3153600000 # 100 year
+            MaxTTL: 3153600000 # 100 year
+            ForwardedValues:
+              Headers:
+                - Origin
+              QueryString: false
+              Cookies:
+                Forward: none
+            ViewerProtocolPolicy: redirect-to-https
+          CacheBehaviors:
+            - TargetOriginId: APIGatewayOrigin
+              PathPattern: "/api/*"
+              ViewerProtocolPolicy: redirect-to-https
+              AllowedMethods:
+                - OPTIONS
+                - HEAD
+                - GET
+                - POST
+                - PUT
+                - PATCH
+                - DELETE
+              CachedMethods:
+                - HEAD
+                - GET
+                - OPTIONS
+              ForwardedValues:
+                Headers:
+                  - "*"
+                QueryString: true
+                Cookies:
+                  Forward: all
+              Compress: true
+              DefaultTTL: 0
+              MinTTL: 0
+              MaxTTL: 0
+          HttpVersion: http2
+          PriceClass: PriceClass_All
+          ViewerCertificate:
+            # Currently ACM Certificate should be issued manually, since issuing ACM cert requires validation process.
+            # @see https://forums.aws.amazon.com/thread.jspa?messageID=821952
+            AcmCertificateArn:
+              Fn::FindInMap:
+                - CDNConfiguration
+                - Ref: Stage
+                - AcmCertificateARN
+            SslSupportMethod: sni-only
+            MinimumProtocolVersion: TLSv1 # For backward compatibility with older devices such Android 4.1.1 (ICS)
+          Logging:
+            Bucket:
+              Fn::GetAtt:
+                - S3Bucket
+                - DomainName
+            Prefix: logs/cloudfront/raw/
+
+    CloudfrontRoute53Record:
+      Type: AWS::Route53::RecordSet
+      Properties:
+        Comment: weird-audiobook Cloudfront ${opt:stage} A (IPv4) Record
+        HostedZoneId:
+          Fn::FindInMap:
+            - CDNConfiguration
+            - Ref: Stage
+            - ZoneId
+        Name:
+          Fn::Join:
+            - "."
+            - - Fn::FindInMap:
+                - CDNConfiguration
+                - Ref: Stage
+                - Domain
+              - ""
+        Type: A
+        AliasTarget:
+          # @see https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-aliastarget.html#cfn-route53-aliastarget-hostedzoneid
+          HostedZoneId: Z2FDTNDATAQYW2 # This value is AWS-defined constant value.
+          DNSName:
+            Fn::Join:
+              - "."
+              - - Fn::GetAtt: [CloudfrontDistribution, DomainName]
+                - ""
+
+    CloudfrontRoute53IPv6Record:
+      Type: AWS::Route53::RecordSet
+      Properties:
+        Comment: weird-audiobook Cloudfront ${opt:stage} AAAA (IPv6) Record
+        HostedZoneId:
+          Fn::FindInMap:
+            - CDNConfiguration
+            - Ref: Stage
+            - ZoneId
+        Name:
+          Fn::Join:
+            - "."
+            - - Fn::FindInMap:
+                  - CDNConfiguration
+                  - Ref: Stage
+                  - Domain
+              - ""
+        Type: AAAA
+        AliasTarget:
+          # @see https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-aliastarget.html#cfn-route53-aliastarget-hostedzoneid
+          HostedZoneId: Z2FDTNDATAQYW2 # This value is AWS-defined constant value.
+          DNSName:
+            Fn::Join:
+              - "."
+              - - Fn::GetAtt: [CloudfrontDistribution, DomainName]
+                - ""
+
+    TaskQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        MessageRetentionPeriod: 604800 # 7 days
+        QueueName:
+          Ref: TaskQueueName
+        VisibilityTimeout: 60
+#        VisibilityTimeout: 1800 # 30 minutes
+
+
+    TaskQueueEventSource:
+      Type: AWS::Lambda::EventSourceMapping
+      Properties:
+        BatchSize: 2
+        Enabled: true
+        EventSourceArn:
+          Fn::GetAtt: [TaskQueue, Arn]
+        FunctionName:
+          Ref: AudiobookProcessorLambdaFunction
+
+    AudiobookProcessorLambdaFunction:
+      Properties:
+        ReservedConcurrentExecutions: 2
+
