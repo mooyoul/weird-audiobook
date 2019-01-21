@@ -10,6 +10,10 @@ export class AudioBookStatusEntity {
 
   @ClassValidator.IsNumber()
   public updated_at: number; // tslint:disable-line
+
+  @ClassValidator.IsString()
+  @ClassValidator.IsOptional()
+  public reason?: string;
 }
 
 export class AudioBookResourceEntity {
@@ -52,6 +56,10 @@ export const presenter =
       const status = new AudioBookStatusEntity();
       status.name = BaseType.AudioBookStatusCode[input.status.code];
       status.updated_at = input.status.updatedAt;
+
+      if (input.status.code === BaseType.AudioBookStatusCode.FAILED) {
+        status.reason = BaseType.FailureReason[input.status.reason];
+      }
 
       return status;
     })();
