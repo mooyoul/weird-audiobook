@@ -8,10 +8,11 @@ import {
 
 import * as Presenters from "./presenters";
 import { routes } from "./routes";
+import { CORSMiddleware } from "./cors-middleware";
 
 const router = new Router([
   new SwaggerRoute(
-    "/swagger",
+    "/api/swagger",
     {
       title: "WeirdAudioBookService",
       version: "1.0.0",
@@ -22,11 +23,12 @@ const router = new Router([
     },
     routes,
   ),
-  new Namespace("", {
+  new Namespace("/api", {
     children: routes,
   }),
 ], {
   middlewares: [
+    new CORSMiddleware(),
   ],
 });
 
