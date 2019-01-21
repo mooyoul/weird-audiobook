@@ -6,9 +6,9 @@ import {
   SwaggerRoute,
 } from "vingle-corgi";
 
+import { CORSMiddleware } from "./cors-middleware";
 import * as Presenters from "./presenters";
 import { routes } from "./routes";
-import { CORSMiddleware } from "./cors-middleware";
 
 const router = new Router([
   new SwaggerRoute(
