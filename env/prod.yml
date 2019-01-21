@@ -1,6 +1,14 @@
 STAGE: prod
 AUDIOBOOK_BUCKET:
   Ref: S3Bucket
+AUDIOBOOK_CDN_BASE_URL:
+  Fn::Join:
+    - ""
+    - - "https://"
+      - Fn::FindInMap:
+        - CDNConfiguration
+        - Ref: Stage
+        - Domain
 # EDIT ME
 CLOVA_CSS_CLIENT_ID: YOUR_CLOVA_CSS_CLIENT_ID
 # EDIT ME
