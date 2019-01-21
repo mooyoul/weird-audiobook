@@ -150,6 +150,9 @@ resources:
             - AllowedHeaders:
                 - "*"
               AllowedOrigins:
+                - "http://blog.weirdx.io"
+                - "https://blog.weirdx.io"
+                - "http://www.lvh.me:8080"
                 # https://example.com/*
                 - Fn::Join:
                     - ""
@@ -266,10 +269,10 @@ resources:
                 - OPTIONS
               ForwardedValues:
                 Headers:
-                  - "*"
+                  - 'Origin'
                 QueryString: true
                 Cookies:
-                  Forward: all
+                  Forward: none
               Compress: true
               DefaultTTL: 0
               MinTTL: 0
