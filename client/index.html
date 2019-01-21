@@ -1,0 +1,373 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>이상한 오디오북</title>
+  <meta name="viewport" content="width=device-width,user-scalable=no,maximum-scale=1,minimum-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css" type="text/css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css" type="text/css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.2/gh-fork-ribbon.min.css">
+  <style type="text/css">
+    * { box-sizing: border-box; }
+
+    body {
+      color: #333;
+    }
+
+    .heading {
+      margin-bottom: 40px;
+    }
+
+    .heading > span {
+      display: inline-block;
+      vertical-align: top;
+    }
+
+    .heading .emoji {
+      display: inline-block;
+      line-height: 72px;
+      font-size: 72px;
+    }
+
+    .heading .text {
+      line-height: 36px;
+      font-size: 32px;
+      padding-left: 8px;
+    }
+
+
+    .bookmarklet {
+      margin-bottom: 32px;
+    }
+
+    .audiobook-form .field {
+      width: 80%;
+      max-width: 640px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /**
+      * Currently bulma breaks default audio element style
+      @see https://github.com/jgthms/bulma/issues/342
+      */
+    audio {
+      height: 54px;
+    }
+
+
+    @media (min-width: 640px) {
+      h1 {
+        margin: 48px 0 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+<a class="github-fork-ribbon" href="http://github.com/mooyoul/weird-audiobook" title="Fork me on GitHub" data-ribbon="Fork me on GitHub">Fork me on GitHub</a>
+<div id="app" class="container">
+  <h1 class="heading has-text-centered">
+    <span class="emoji">📖</span>
+    <span class="text has-text-left">이상한<br>오디오북</span>
+  </h1>
+  <div class="bookmarklet has-text-centered">
+    <a title="이상한 오디오북 북마클릿" class="button" href="javascript:(function()%7B(function()%7Bfunction%20m(d%2Cb)%7Bp(d%2Cfunction(a%2Cc)%7Bif(a)return%20b(a)%3Bswitch(c.status.name)%7Bcase%20%22QUEUED%22%3Acase%20%22PROCESSING%22%3Areturn%20m(d%2Cb)%3Bcase%20%22AVAILABLE%22%3Areturn%20b(null%2Cc)%3Bcase%20%22FAILED%22%3Areturn%20b(Error(%22Failed%20to%20process%20audiobook%20(reason%3A%20%22%2Bc.status.reason%2B%22)%22))%3Bdefault%3Areturn%20b(Error(%22Got%20unknown%20audiobook%20status%20code%22))%7D%7D)%7Dfunction%20k(d)%7Be.innerHTML%3D%22%3Cp%3EFailed%20to%20load%20audiobook%3A%20%22%2Bd.message%2B'%20-%20%3Ca%20href%3D%22https%3A%2F%2Fgithub.com%2Fmooyoul%2Fweird-audiobook%2Fissues%2Fnew%22%20target%3D%22_blank%22%3EHow%20about%20filling%20new%20issue%3F%3C%2Fa%3E%3C%2Fp%3E'%7Dfunction%20p(d%2Cb)%7Bvar%20a%3Dnew%20XMLHttpRequest%3Ba.open(%22GET%22%2C%22https%3A%2F%2Fweird-audiobook.aws.debug.so%2Fapi%2Faudiobooks%2F%22%2Bd%2C!0)%3Ba.onload%3Dfunction()%7Bif(200%3C%3Da.status%26%26300%3Ea.status)%7Bvar%20c%3DJSON.parse(a.responseText)%3Bb(null%2Cc.data)%7Delse%20b(Error(%22Got%20unexpected%20response%20status%20code%22))%3Ba.onload%3Dnull%3Ba.onerror%3Dnull%7D%3Ba.onerror%3Dfunction(c)%7Bb(c)%3Ba.onload%3Dnull%3Ba.onerror%3Dnull%7D%3Ba.send()%7Dfunction%20n(d)%7Bif(window.Hls)%7Bl.remove()%3Bvar%20b%3Dd.resources.filter(function(a)%7Breturn%22AWS_POLLY_SEOYEON%22%3D%3D%3Da.speaker%7D)%3Bif(!b.length)return%20k(Error(%22Failed%20to%20find%20primary%20speaker%22))%3Bvar%20a%3Ddocument.createElement(%22audio%22)%3Ba.controls%3D!0%3Be.appendChild(a)%3Bvar%20c%3Ddocument.createElement(%22p%22)%3Bc.innerHTML%3D'Provided%20by%20%3Ca%20href%3D%22https%3A%2F%2Fgithub.com%2Fmooyoul%2Fweird-audiobook%22%20target%3D%22_blank%22%3Eweird-audiobook%3C%2Fa%3E'%3Be.appendChild(c)%3Bc%3Db.find(function(a)%7Breturn%22HLS%22%3D%3D%3Da.transport%7D)%3Bb%3Db.find(function(a)%7Breturn%22HTTP%22%3D%3D%3Da.transport%26%26%22MP3%22%3D%3D%3Da.codec%7D)%3Bc%3FHls.isSupported()%3F(b%3Dnew%20Hls%2Cb.loadSource(c.url)%2Cb.attachMedia(a)%2Cb.on(Hls.Events.MANIFEST_PARSED%2Cfunction()%7Ba.play()%7D))%3Aa.canPlayType(%22application%2Fvnd.apple.mpegurl%22)%3F(a.src%3Dc.url%2Ca.addEventListener(%22loadedmetadata%22%2Cfunction()%7Ba.play()%7D))%3Ak(Error(%22This%20browser%20does%20not%20support%20HLS%22))%3Ab%26%26(a.src%3Db.url%2Ca.addEventListener(%22loadedmetadata%22%2Cfunction()%7Ba.play()%7D))%7Delse%20f.onload%3Dfunction()%7Bf.onload%3Dnull%3Bn(d)%7D%7Dif(!window.__WEIRD_AUDIOBOOK_INITIALIZED__%26%26(window.__WEIRD_AUDIOBOOK_INITIALIZED__%3D!0%2C%22blog.weirdx.io%22%3D%3D%3Dlocation.hostname))%7Bvar%20h%3Dlocation.pathname.match(%2F%5E%5C%2Fpost%5C%2F(%5Cd%2B)(%3F%3A%5C%2F)%3F%24%2Fi)%3Bif(h)%7Bh%3DparseInt(h%5B1%5D%2C10)%3Bvar%20f%3Ddocument.createElement(%22script%22)%3Bf.src%3D%22https%3A%2F%2Fcdnjs.cloudflare.com%2Fajax%2Flibs%2Fhls.js%2F0.10.1%2Fhls.light.min.js%22%3Bf.type%3D%22text%2Fjavascript%22%3Bf.async%3D!0%3Bdocument.body.appendChild(f)%3Bvar%20g%3Ddocument.querySelector(%22.entry-content%22)%2Ce%3Ddocument.createElement(%22div%22)%3Be.className%3D%22weird-audiobook-container%22%3Bg.insertBefore(e%2Cg.firstChild)%3Bvar%20l%3Ddocument.createElement(%22p%22)%3Bl.className%3D%22weird-audiobook-loader%22%3Be.appendChild(l)%3Bg%3Ddocument.createElement(%22style%22)%3Bg.innerHTML%3D'%40-webkit-keyframes%20weirdAudiobookSpinner%20%7B%5Cn%20%20from%20%7B%5Cn%20%20%20%20-webkit-transform%3A%20rotate(0deg)%3B%5Cn%20%20%20%20%20%20%20%20%20%20%20%20transform%3A%20rotate(0deg)%3B%5Cn%20%20%7D%5Cn%20%20to%20%7B%5Cn%20%20%20%20-webkit-transform%3A%20rotate(359deg)%3B%5Cn%20%20%20%20%20%20%20%20%20%20%20%20transform%3A%20rotate(359deg)%3B%5Cn%20%20%7D%5Cn%7D%5Cn%40keyframes%20weirdAudiobookSpinner%20%7B%5Cn%20%20from%20%7B%5Cn%20%20%20%20-webkit-transform%3A%20rotate(0deg)%3B%5Cn%20%20%20%20%20%20%20%20%20%20%20%20transform%3A%20rotate(0deg)%3B%5Cn%20%20%7D%5Cn%20%20to%20%7B%5Cn%20%20%20%20-webkit-transform%3A%20rotate(359deg)%3B%5Cn%20%20%20%20%20%20%20%20%20%20%20%20transform%3A%20rotate(359deg)%3B%5Cn%20%20%7D%5Cn%7D%5Cn%5Cn.weird-audiobook-loader%3Abefore%20%7B%5Cn%20%20animation%3A%20weirdAudiobookSpinner%20500ms%20infinite%20linear%3B%5Cn%20%20border%3A%202px%20solid%20%23dfdfdf%3B%5Cn%20%20border-radius%3A%2050%25%3B%5Cn%20%20border-right-color%3A%20transparent%3B%5Cn%20%20border-top-color%3A%20transparent%3B%5Cn%20%20content%3A%20%22%22%3B%5Cn%20%20display%3A%20block%3B%5Cn%20%20height%3A%2048px%3B%5Cn%20%20position%3A%20relative%3B%5Cn%20%20width%3A%2048px%3B%5Cn%7D%5Cn%5Cn.weird-audiobook-container%20%7B%20max-width%3A%20730px%3B%20margin%3A%200%20auto%2080px%3B%20%7D'%3Bdocument.head.appendChild(g)%3Bm(h%2Cfunction(d%2Cb)%7Bif(d)return%20k(d)%3Bn(b)%7D)%7D%7D%7D)()%7D)()">
+      이상한 오디오북 북마클릿
+    </a>
+    <p class="help">
+      위 북마클릿을 북마크에 추가해 북마클릿으로 사용하거나, 아래에서 직접 URL을 입력해 재생할 수 있습니다.
+    </p>
+  </div>
+  <transition name="fade">
+    <audiobook-form v-if="!audiobook" @available="onAvailable" key="form"></audiobook-form>
+    <audiobook-information v-if="audiobook" :audiobook="audiobook" key="information"></audiobook-information>
+  </transition>
+</div>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/0.10.1/hls.light.min.js"></script>s
+<script type="text/javascript" src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script type="text/javascript" src="https://unpkg.com/vue"></script>
+<script type="text/javascript">
+  const BASE_URL = (() => {
+    return "https://weird-audiobook.aws.debug.so";
+    const el = document.createElement('a');
+    el.href = location.origin + location.pathname + '/../../';
+
+    const resolvedURL = el.href; // hack: resolved url will be returned
+
+    el.remove();
+    return resolvedURL.replace(/[\/]+$/, ''); // remove trailing slashes
+  })();
+
+  const axiosInstance = axios.create({
+    baseURL: `${BASE_URL}/api/`,
+  });
+
+  const AudiobookForm = {
+    data() {
+      return {
+        audiobook: null,
+        postId: null,
+        input: null,
+        loading: false,
+        validationError: null,
+        serverError: null,
+      };
+    },
+    computed: {
+      error() {
+        return this.validationError || this.serverError;
+      }
+    },
+    watch: {
+      input() {
+        this.validateInput();
+      },
+    },
+    methods: {
+      validateInput() {
+        const value = this.input;
+        if (!value) {
+          return this.validationError = "This field is required.";
+        }
+
+        let match = value.match(/^\d+$/);
+        if (match) {
+          this.postId = parseInt(match[0], 10);
+          return this.validationError = null;
+        }
+
+        if (value.match(/^https?:/)) {
+          try {
+            const u = new URL(value);
+
+            match = u.pathname.match(/^\/post\/(\d+)(?:\/)?$/i);
+            if (u.hostname === "blog.weirdx.io" && match) {
+              console.log("MATCH: ", match);
+              this.postId = parseInt(match[1], 10);
+              return this.validationError = null;
+            }
+          } catch (e) { /* noop */ }
+
+          return this.validationError = "This value is not valid URL";
+        }
+
+        return this.validationError = "This field should be number, or URL";
+      },
+      async onSubmit() {
+        if (this.validateInput()) {
+          return;
+        }
+
+        this.loading = true;
+        this.serverError = null;
+
+        try {
+          while (true) {
+            this.audiobook = await this.getAudiobook(this.postId);
+
+            const status = this.audiobook.status.name;
+
+            switch (status) {
+              case "AVAILABLE": {
+                this.$emit("available", this.audiobook);
+                return;
+              }
+              case "FAILED": {
+                this.serverError = `Failed to process audiobook (reason: ${this.audiobook.status.reason})`;
+                return;
+              }
+              case "QUEUED":
+              case "PROCESSING": {
+                await new Promise((resolve) => setTimeout(resolve, 3000));
+                break;
+              }
+              default: {
+                this.serverError = `Received unknown status: ${status}`;
+                return;
+              }
+            }
+
+          }
+        } catch (e) {
+          if (e.response && e.response.data && e.response.data.error) {
+            this.serverError = e.response.data.error.message;
+            return;
+          }
+
+          console.error("Got unexpected error: ", e.stack);
+          this.serverError = e.message;
+        } finally {
+          this.loading = false;
+        }
+      },
+      async getAudiobook(postId) {
+        const response = await axiosInstance({
+          method: 'GET',
+          url: `/audiobooks/${postId}`,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const { data: audiobook } = response.data;
+
+        return audiobook;
+      },
+    },
+    template:
+      `<form class="audiobook-form has-text-centered" @submit.stop.prevent="onSubmit">
+<div class="field has-addons">
+  <div class="control is-expanded">
+    <input class="input" type="text" placeholder="Type Post ID or Paste Post URL" :class="{ 'is-danger': validationError }" v-model="input">
+  </div>
+  <div class="control">
+    <button type="submit" class="button is-primary" :disabled="validationError || loading" :class="{ 'is-loading': loading }">
+      Search
+    </button>
+  </div>
+</div>
+<div class="field">
+  <p class="help" :class="{ 'is-danger': error }">{{ error }}</p>
+</div>
+<div class="field" v-if="audiobook">
+  <p class="help">Status: {{ audiobook.status.name }}</p>
+  <p v-if="audiobook.status.name === FAILED">
+    Wow. I guess you've found a bug. <a href="https://github.com/mooyoul/weird-audiobook/issues/new" target="_blank">How about filling new issue?</a>
+  </p>
+</p>
+</div>
+</form>`,
+  };
+
+  const AudiobookInformation = {
+    props: ['audiobook'],
+    data() {
+      const speakers = (() => {
+        const grouped = this.audiobook.resources.reduce((hash, r) => {
+          if (!hash[r.speaker]) {
+            hash[r.speaker] = [];
+          }
+
+          hash[r.speaker].push(r);
+
+          return hash;
+        }, {});
+
+        return Object.keys(grouped).map((k) => ({ name: k, resources: grouped[k] }));
+      })();
+
+      const [ selectedSpeaker ] = speakers;
+      const [ selectedResource ] = selectedSpeaker.resources;
+
+      return {
+        mounted: false,
+        speakers,
+        selectedSpeaker,
+        selectedResource,
+      };
+    },
+    mounted() {
+      if (this.selectedResource) {
+        this.loadResource(this.selectedResource);
+      }
+    },
+    watch: {
+      selectedSpeaker(speaker) {
+        this.selectedResource = speaker.resources[0];
+      },
+      selectedResource(resource) {
+        this.loadResource(resource);
+      },
+    },
+    methods: {
+      loadResource(resource) {
+        const playerEl = this.$refs.player;
+        if (resource.transport === "HLS") {
+          if (Hls.isSupported()) {
+            const hls = new Hls();
+            hls.loadSource(resource.url);
+            hls.attachMedia(playerEl);
+            hls.on(Hls.Events.MANIFEST_PARSED, () => {
+              playerEl.play();
+            });
+          } else if (playerEl.canPlayType("application/vnd.apple.mpegurl")) {
+            playerEl.src = resource.url;
+            playerEl.addEventListener('loadedmetadata', () => {
+              playerEl.play();
+            });
+          }
+        } else {
+          playerEl.src = resource.url;
+          playerEl.addEventListener('loadedmetadata', () => {
+            playerEl.play();
+          });
+        }
+      }
+    },
+    computed: {
+      audiobookJSON() {
+        return JSON.stringify(this.audiobook, null, 2);
+      },
+    },
+    template:
+      `<div class="image-information-container columns is-desktop">
+<div class="column is-two-thirds">
+  <form>
+    <div class="field is-horizontal">
+      <div class="field-label is-normal">
+        <label class="label">Audiobook {{ audiobook.id }}</label>
+      </div>
+      <div class="field-body">
+        <div class="field">
+          <div class="control">
+            <div class="select is-fullwidth">
+              <select v-model="selectedSpeaker">
+                <option v-for="speaker in speakers" :value="speaker">{{ speaker.name }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="control">
+            <div class="select is-fullwidth" v-if="selectedSpeaker">
+              <select v-model="selectedResource">
+                <option v-for="resource in selectedSpeaker.resources" :value="resource">{{ resource.transport }} - {{ resource.codec }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <audio ref="player" controls></audio>
+</div>
+<div class="column">
+  <pre class="has-text-left">{{ audiobookJSON }}</pre>
+</div>
+</div>`,
+  };
+
+  const app = new Vue({
+    el: '#app',
+    components: {
+      'audiobook-form': AudiobookForm,
+      'audiobook-information': AudiobookInformation,
+    },
+    data() {
+      return {
+        audiobook: null,
+      };
+    },
+    methods: {
+      onAvailable(audiobook) {
+        console.log('onAvailable called: ', audiobook);
+        this.audiobook = audiobook;
+      },
+    },
+  });
+</script>
+</body>
+</html>
