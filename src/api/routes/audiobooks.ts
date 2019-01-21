@@ -21,28 +21,10 @@ export const route =
       }, {}, Presenters.AudioBookItem, async function() {
         const id = this.params.id as number;
 
-        const book = await AudioBook.primaryKey.get(id);
-
-        if (!book) {
-          throw new StandardError(404, {
-            code: "RECORD_NOT_EXIST",
-            message: "Given post haven't created text-to-speech yet",
-          });
+        let book = await AudioBook.primaryKey.get(id);
+        if (book) {
+          return book;
         }
-
-        return book;
-      }),
-
-      PresenterRouteFactory.POST("/:id", {
-        desc: "Create new audiobook of given post id",
-        operationId: "createAudiobook",
-      }, {}, Presenters.AudioBookItem, async function() {
-        const id = this.params.id as number;
-        //
-        // let book = await AudioBook.primaryKey.get(id);
-        // if (book) {
-        //   return book;
-        // }
 
         if (!(await WeirdBlog.exists(id))) {
           throw new StandardError(404, {
@@ -51,7 +33,7 @@ export const route =
           });
         }
 
-        const book = AudioBook.create(id);
+        book = AudioBook.create(id);
         await book.save();
 
         await sqs.sendMessage({
