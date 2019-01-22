@@ -13,6 +13,7 @@
 
     body {
       color: #333;
+      padding-top: 96px;
     }
 
     .heading {
@@ -58,9 +59,19 @@
 
 
     @media (min-width: 640px) {
-      h1 {
-        margin: 48px 0 24px;
+      .heading {
+        margin: 48px 0 72px;
       }
+      .heading .emoji {
+        line-height: 144px;
+        font-size: 144px;
+      }
+      .heading .text {
+        line-height: 72px;
+        font-size: 64px;
+        padding-left: 16px;
+      }
+
     }
   </style>
 </head>
