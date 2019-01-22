@@ -156,7 +156,6 @@
 
             match = u.pathname.match(/^\/post\/(\d+)(?:\/)?$/i);
             if (u.hostname === "blog.weirdx.io" && match) {
-              console.log("MATCH: ", match);
               this.postId = parseInt(match[1], 10);
               return this.validationError = null;
             }
@@ -374,7 +373,6 @@
     },
     methods: {
       onAvailable(audiobook) {
-        console.log('onAvailable called: ', audiobook);
         this.audiobook = audiobook;
       },
     },
