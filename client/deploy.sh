@@ -25,9 +25,10 @@ pushd "${DIRNAME}/.."
 echo "Copying built files to s3..."
 cd client
 aws s3 cp index.html s3://${BUCKET_NAME}/index.html
+aws s3 cp bookmarklet.js s3://${BUCKET_NAME}/bookmarklet.js
 
 echo "Invalidating cache..."
-INVALIDATION_ID=$(aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_DISTRIBUTION_ID} --paths / /index.html --query Invalidation.Id --output text)
+INVALIDATION_ID=$(aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_DISTRIBUTION_ID} --paths / /index.html /bookmarklet.js --query Invalidation.Id --output text)
 
 echo "Waiting for cache invalidation complete..."
 aws cloudfront wait invalidation-completed --distribution-id ${CLOUDFRONT_DISTRIBUTION_ID} --id ${INVALIDATION_ID} --output text
