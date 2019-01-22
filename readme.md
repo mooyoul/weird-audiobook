@@ -9,6 +9,13 @@ This service provides audiobook feature for [weird-meetup blog](http://blog.weir
 ![diagram](/assets/weird-audiobook-diagram.png)
 
 
+## Shortcuts Support
+
+This service provides Shortcuts - [Add Shortcuts to your device](https://www.icloud.com/shortcuts/387eff4a8f124ee0aa00481d49d47745)
+
+![shortcuts demo](/assets/weird-audiobook-shortcuts.gif)
+
+
 ## What's this do?
 
 - Fetch article from weird meetup blog
