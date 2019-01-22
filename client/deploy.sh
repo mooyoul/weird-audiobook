@@ -23,8 +23,8 @@ function cleanup() {
 pushd "${DIRNAME}/.."
 
 echo "Copying built files to s3..."
-cd dist
-aws s3 cp --recursive index.html s3://${BUCKET_NAME}/index.html
+cd client
+aws s3 cp index.html s3://${BUCKET_NAME}/index.html
 
 echo "Invalidating cache..."
 INVALIDATION_ID=$(aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_DISTRIBUTION_ID} --paths / /index.html --query Invalidation.Id --output text)
