@@ -235,6 +235,7 @@ resources:
           Enabled: true
           Comment: weird-audiobook-${opt:stage}
           IPV6Enabled: true
+          DefaultRootObject: index.html
           DefaultCacheBehavior:
             AllowedMethods:
               - GET
