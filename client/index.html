@@ -94,6 +94,14 @@
     <audiobook-form v-if="!audiobook" @available="onAvailable" key="form"></audiobook-form>
     <audiobook-information v-if="audiobook" :audiobook="audiobook" key="information"></audiobook-information>
   </transition>
+  <footer class="footer">
+    <div class="content has-text-centered">
+      <p>
+        <strong>Made with ❤️</strong> by <a href="https://github.com/mooyoul">MooYeol Prescott Lee</a>. The source code is licensed
+        <a href="https://github.com/mooyoul/weird-audiobook/blob/master/LICENSE" target="_blank">MIT</a>.
+      </p>
+    </div>
+  </footer>
 </div>
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-132867475-1"></script>
