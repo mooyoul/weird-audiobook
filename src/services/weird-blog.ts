@@ -78,22 +78,16 @@ export class WeirdBlog {
       ].join(", "))).forEach((el) => el.remove());
 
       // Replace code blocks
-      const codeBlocks = articleEl.querySelectorAll("code");
+      const codeBlocks = articleEl.querySelectorAll("pre > code");
 
       if (codeBlocks.length >= 0) {
         const entry = articleEl.querySelector(".entry-content")!;
         const notice = doc.createElement("p");
-        notice.innerText = "이 포스트는 코드 스니펫을 포함하고 있습니다. 코드 스니펫을 확인하시려면 브라우저를 사용해주세요.";
-        entry.appendChild(notice);
+        notice.innerHTML = "이 포스트는 코드 스니펫을 포함하고 있습니다. 코드 스니펫을 확인하시려면 브라우저를 사용해주세요.";
+        entry.insertBefore(notice, entry.firstChild);
 
         Array.from(codeBlocks).forEach((el) => {
-          const target = el.parentElement!.tagName === "pre" ?
-            el.parentElement! :
-            el;
-
-          const text = doc.createElement("p");
-          text.innerText = "코드 스니펫";
-          target.parentElement!.replaceChild(target, text);
+          el.innerHTML = "코드 스니펫";
         });
       }
 
