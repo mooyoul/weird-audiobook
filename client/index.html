@@ -270,7 +270,7 @@
 </div>
 <div class="field" v-if="audiobook">
   <p class="help">Status: {{ audiobook.status.name }}</p>
-  <p v-if="audiobook.status.name === FAILED">
+  <p v-if="audiobook.status.name === 'FAILED'">
     Wow. I guess you've found a bug. <a href="https://github.com/mooyoul/weird-audiobook/issues/new" target="_blank">How about filling new issue?</a>
   </p>
 </p>
