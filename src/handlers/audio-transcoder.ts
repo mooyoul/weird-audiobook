@@ -34,6 +34,7 @@ export interface AudioTranscoderOutput {
   duration: string;
 }
 
+const DEFAULT_SOCKET_TIMEOUT_MS = 10000;
 const MAX_UPLOAD_CONCURRENCY = 16;
 const DEFAULT_CACHE_CONTROL = "public, max-age=3153600000";
 
@@ -75,7 +76,7 @@ export async function handler(event: AudioTranscoderInput): Promise<AudioTransco
   const ffmpegArgs: string[] = (() => {
     const base = [
       "-loglevel", "warning",
-      "-timeout", `10000`, // in microseconds
+      "-timeout", `${DEFAULT_SOCKET_TIMEOUT_MS * 1000}`, // in microseconds
       "-reconnect", "1",
       "-i", sourceUrl,
       "-vn",
