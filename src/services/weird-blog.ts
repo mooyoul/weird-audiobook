@@ -67,7 +67,18 @@ export class WeirdBlog {
 
     const title = doc.title.trim();
     const author = body.querySelector(".author [rel='author']")!.textContent!.trim();
-    const content = body.querySelector("article.post")!.innerHTML;
+    const content = (() => {
+      const articleEl = body.querySelector("article.post")!;
+
+      // Remove unnecessary parts
+      Array.from(articleEl.querySelectorAll([
+        ".entry-content > .sharedaddy",
+        ".entry-content > .yarpp-related",
+        ".entry-content > .tags",
+      ].join(", "))).forEach((el) => el.remove());
+
+      return articleEl.innerHTML!;
+    })();
 
     return {
       id: postId,
